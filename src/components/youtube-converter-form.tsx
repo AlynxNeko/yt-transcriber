@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -18,22 +19,24 @@ export default function YouTubeConverterForm() {
   const [notes, setNotes] = useState("")
   const [outputFormat, setOutputFormat] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    console.log({
+    // Store form data in sessionStorage for the processing page
+    const formData = {
       youtubeUrl,
       notes,
       outputFormat,
-    })
+      timestamp: Date.now(),
+    }
 
-    setIsSubmitting(false)
-    // Reset form or show success message
+    sessionStorage.setItem("conversionData", JSON.stringify(formData))
+
+    // Navigate to processing page
+    router.push("/processing")
   }
 
   const isValidYouTubeUrl = (url: string) => {
