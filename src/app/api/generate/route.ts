@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
     }
 
     const prompt = `You are a helpful assistant. Given the transcript of a YouTube video, generate a ${
-      format === "pptx" ? "PowerPoint slide content (make sure each slide don't have too many content, make it into the next slide)" : "well-structured Word document"
-      }. Include relevant titles, bullet points, and summaries. Only respond with the Markdown"${
+      format === "pptx" ? "PowerPoint slide content (if the content is a lot in a slide, split into two with '(1)' '(2)' mark in the title). No need to specify Slide 1 or Slide 2 etc" : "well-structured Word document"
+      }. Include relevant titles, bullet points, and summaries. Make sure to make it very detailed"${
         notes ? `User notes: "${notes}".` : ""
       }
 

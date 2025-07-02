@@ -80,12 +80,6 @@ export default function ResultsPage() {
     )
   }
 
-  const formatFileSize = () => {
-    // Simulate file size based on format
-    const baseSize = Math.floor(Math.random() * 5) + 2 // 2-7 MB
-    return `${baseSize}.${Math.floor(Math.random() * 9)}${Math.floor(Math.random() * 9)} MB`
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
       <Card className="w-full max-w-lg shadow-lg">
@@ -103,7 +97,7 @@ export default function ResultsPage() {
                 {getFormatIcon(conversionData.outputFormat)}
                 <div>
                   <p className="font-medium text-gray-800">YouTube_Video.{conversionData.outputFormat}</p>
-                  <p className="text-sm text-gray-600">{formatFileSize()} • Ready for download</p>
+                  <p className="text-sm text-gray-600">Ready for download</p>
                 </div>
               </div>
             </div>

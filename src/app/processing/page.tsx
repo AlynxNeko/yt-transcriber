@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Youtube, FileText, Presentation, CheckCircle } from "lucide-react"
@@ -25,8 +25,14 @@ export default function ProcessingPage() {
     "Finalizing document...",
     "Processing complete!",
   ]
+  const hasRunRef = useRef(false)
+  const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
+  // Prevent multiple runs of the effect
+  if (hasRunRef.current || hasError) return
+  hasRunRef.current = true
+  
     const storedData = sessionStorage.getItem("conversionData")
     if (!storedData) {
       router.push("/")
@@ -37,48 +43,59 @@ export default function ProcessingPage() {
     setConversionData(data)
 
     const runProcessing = async () => {
-      try {
-        // === 1. Fetch transcript ===
-        const res = await fetch("/api/transcript", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ youtubeUrl: data.youtubeUrl }),
-        })
+    try {
+      // Step 1
+      setCurrentStep(0)
+      const res = await fetch("/api/transcript", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ youtubeUrl: data.youtubeUrl }),
+      })
 
-        if (!res.ok) {
-          const error = await res.text()
-          throw new Error("Transcript API failed: " + error)
-        }
-
-        const json = await res.json()
-        const transcript = json.transcript.map((t: any) => t.text).join(" ")
-
-        // === 2. GPT request ===
-        const gptRes = await fetch("/api/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            transcript,
-            notes: data.notes,
-            format: data.outputFormat,
-          }),
-        })
-
-        const gptData = await gptRes.json()
-        console.log("GPT response:", gptData)
-        if (!gptData.content) throw new Error("No GPT content returned")
-
-        // === 3. Save result ===
-        sessionStorage.setItem("gptOutput", gptData.content)
-      } catch (err) {
-        console.error("Processing failed:", err)
-        alert("Failed to process video.")
-        router.push("/")
+      if (!res.ok) {
+        const error = await res.text()
+        throw new Error("Transcript API failed: " + error)
       }
-    }
 
-    runProcessing()
-  }, [router])
+      const json = await res.json()
+      const transcript = json.transcript.map((t: any) => t.text).join(" ")
+
+      // Step 2
+      setCurrentStep(1)
+      const gptRes = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transcript,
+          notes: data.notes,
+          format: data.outputFormat,
+        }),
+      })
+
+      const gptData = await gptRes.json()
+      if (!gptData.content) throw new Error("No GPT content returned")
+
+      // Step 3
+      setCurrentStep(2)
+      sessionStorage.setItem("gptOutput", gptData.content)
+
+      // Fake final steps
+      const finalSteps = [3, 4, 5]
+      for (const s of finalSteps) {
+        await new Promise((res) => setTimeout(res, 1000))
+        setCurrentStep(s)
+      }
+
+      setTimeout(() => router.push("/results"), 1500)
+    } catch (err) {
+      console.error("Processing failed:", err)
+      alert("Failed to process video.")
+      router.push("/")
+    }
+  }
+
+  runProcessing()
+  }, [router, hasError])
 
 
   if (!conversionData) {
