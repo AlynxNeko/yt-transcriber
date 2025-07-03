@@ -27,6 +27,11 @@ function parseBold(text: string): TextRun[] {
 function parseMarkdownLine(line: string): Paragraph {
   const trimmed = line.trim();
 
+  // Skip separator lines like *** or ---
+  if (/^(\*{3,}|-{3,})$/.test(trimmed)) {
+    return new Paragraph({}); // empty paragraph (effectively skipped)
+  }
+
   // Skip AI fluff
   if (trimmed.startsWith("Of course!") || trimmed.startsWith("Sure!")) {
     return new Paragraph({});
@@ -36,19 +41,17 @@ function parseMarkdownLine(line: string): Paragraph {
   if (trimmed.startsWith("##### ")) {
     return new Paragraph({
       heading: HeadingLevel.HEADING_5,
-      children: parseBold(trimmed.replace(/^###\s*/, "")),
+      children: parseBold(trimmed.replace(/^#####\s*/, "")),
     });
   }
 
-  // Headings with bold support
   if (trimmed.startsWith("#### ")) {
     return new Paragraph({
       heading: HeadingLevel.HEADING_4,
-      children: parseBold(trimmed.replace(/^###\s*/, "")),
+      children: parseBold(trimmed.replace(/^####\s*/, "")),
     });
   }
 
-  // Headings with bold support
   if (trimmed.startsWith("### ")) {
     return new Paragraph({
       heading: HeadingLevel.HEADING_3,
@@ -67,6 +70,14 @@ function parseMarkdownLine(line: string): Paragraph {
     return new Paragraph({
       heading: HeadingLevel.HEADING_1,
       children: parseBold(trimmed.replace(/^#\s*/, "")),
+    });
+  }
+
+  // Bullet point
+  if (trimmed.startsWith("* ")) {
+    return new Paragraph({
+      bullet: { level: 0 },
+      children: parseBold(trimmed.slice(2)),
     });
   }
 

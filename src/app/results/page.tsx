@@ -51,7 +51,7 @@ export default function ResultsPage() {
 
       const link = document.createElement("a")
       link.href = URL.createObjectURL(blob)
-      link.download = `YouTube_Video.${conversionData.outputFormat}`
+      link.download = sessionStorage.getItem("Title_")+`.${conversionData.outputFormat}`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -96,7 +96,7 @@ export default function ResultsPage() {
               <div className="flex items-center gap-3">
                 {getFormatIcon(conversionData.outputFormat)}
                 <div>
-                  <p className="font-medium text-gray-800">YouTube_Video.{conversionData.outputFormat}</p>
+                  <p className="font-medium text-gray-800">{sessionStorage.getItem("Title_")}.{conversionData.outputFormat}</p>
                   <p className="text-sm text-gray-600">Ready for download</p>
                 </div>
               </div>

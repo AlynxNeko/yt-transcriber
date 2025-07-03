@@ -42,7 +42,7 @@ function cleanBulletLine(line: string): string {
 }
 
 // --- Split a paragraph into lines, and wrap long lines to maxLen ---
-function normalizeLines(input: string, maxLen = 80): string[] {
+function normalizeLines(input: string, maxLen = 75): string[] {
   const rawLines = input.split("\n").filter((l) => l.trim() !== "")
   const finalLines: string[] = []
 
@@ -102,50 +102,114 @@ export async function generatePptxFile(content: string): Promise<Blob> {
     }
   })
 
+  // --- Front slide (Styled like reference image) ---
+  const front = pptx.addSlide()
+
+  // Main Title
+  let title_ = sessionStorage.getItem("Title_") || "{Title}"
+
+  // Split if > 20 characters
+  if (title_.length > 20) {
+    const middle = Math.floor(title_.length / 2)
+
+    // Find closest space around the middle
+    let splitIndex = title_.lastIndexOf(" ", middle)
+    if (splitIndex === -1 || splitIndex < 5) {
+      splitIndex = title_.indexOf(" ", middle) // fallback to next space
+    }
+
+    if (splitIndex !== -1) {
+      title_ = title_.slice(0, splitIndex) + "\n" + title_.slice(splitIndex + 1)
+    }
+  }
+
+  front.addText(title_ || "{Title}", {
+    x: 0.7,
+    y: 0.0,
+    w: 8,
+    h: 2,
+    fontSize: 42,
+    bold: true,
+    color: "000000",
+    align: "left",
+    fontFace: "Arial",
+  })
+
+  // Subtitle
+  front.addText("Introduction Proposal", {
+    x: 0.7,
+    y: 1.9,
+    fontSize: 18,
+    color: "000000",
+    bold: false,
+    fontFace: "Arial",
+  })
+
+  // Year (bolded)
+  front.addText("Year of 2025", {
+    x: 0.7,
+    y: 2.2,
+    fontSize: 18,
+    bold: true,
+    color: "000000",
+    fontFace: "Arial",
+  })
+
+  // Attribution
+  front.addText("from Pasti Bisa Digital", {
+    x: 0.7,
+    y: 2.5,
+    fontSize: 14,
+    color: "444444",
+    fontFace: "Arial",
+  })
+
+  // Footer (copyright notice)
+  front.addText("© 2025 Pasti Bisa Digital. All rights reserved.\nThis document and its contents are the property of Pasti Bisa Digital and are protected by copyright laws. Unauthorized reproduction, distribution, or modification of this document, in whole or in part, is prohibited without prior written consent from Pasti Bisa Digital.", {
+    x: 0.7,
+    y: 4.5,
+    w: 8,
+    h: 1,
+    fontSize: 8,
+    color: "555555",
+    fontFace: "Arial",
+  })
+
+  // Logo
+  front.addImage({
+    path: "pbdlogo.png",
+      x: 8.25, y: 0.2, w: 1.5, h: 0.5
+  })
+
   chunks.forEach((chunk) => {
-    const slide = pptx.addSlide()
     const logicalLines = normalizeLines(chunk)
     let y = 0.5
+    const textBlocks: { block: PptxGenJS.TextProps[]; options: any }[] = []
 
     logicalLines.forEach((rawLine) => {
       const trimmed = rawLine.trim()
-      const headingProps = getHeadingProps(trimmed)
-
-      let text = trimmed
-      let isBullet = false
-
-      if (text === "" || trimmed.startsWith("```") || trimmed.startsWith("***") || trimmed.startsWith("---")) {
-        // Skip empty lines, code blocks, or horizontal rules
+      if (trimmed === "" || trimmed.startsWith("```") || trimmed.startsWith("***") || trimmed.startsWith("---"))
         return
-      }
 
-      // Skip greeting lines from generated text
-      // Only skip greeting lines if it's the first chunk
-      // Skip greeting lines from generated text, and also skip the next line if it's a continuation (not a heading or bullet)
-      if (
-        chunks.indexOf(chunk) === 0 &&
-        (
-          trimmed.toLowerCase().startsWith("hi") ||
-          trimmed.toLowerCase().startsWith("hello") ||
-          trimmed.toLowerCase().startsWith("here is") ||
-          trimmed.toLowerCase().startsWith("ofcourse") ||
-          trimmed.toLowerCase().startsWith("of course") ||
-          trimmed.toLowerCase().startsWith("sure")
-        )
-      ) {
-        // Also skip the next logical line if it doesn't look like a heading or bullet
+      if (chunks.indexOf(chunk) === 0 && (
+        trimmed.toLowerCase().startsWith("hi") ||
+        trimmed.toLowerCase().startsWith("hello") ||
+        trimmed.toLowerCase().startsWith("here is") ||
+        trimmed.toLowerCase().startsWith("ofcourse") ||
+        trimmed.toLowerCase().startsWith("of course") ||
+        trimmed.toLowerCase().startsWith("sure")
+      )) {
         const nextIdx = logicalLines.indexOf(rawLine) + 1
         if (
           nextIdx < logicalLines.length &&
           !isBulletLine(logicalLines[nextIdx].trim()) &&
           !/^#+\s+/.test(logicalLines[nextIdx].trim())
-        ) {
-          logicalLines[nextIdx] = "" // Mark as empty so it will be skipped
-        }
+        ) logicalLines[nextIdx] = ""
         return
       }
 
-
+      let text = trimmed
+      let isBullet = false
       if (isBulletLine(trimmed)) {
         text = cleanBulletLine(trimmed)
         isBullet = true
@@ -153,20 +217,34 @@ export async function generatePptxFile(content: string): Promise<Blob> {
         text = trimmed.replace(/^#+\s+/, "")
       }
 
-      const wrappedLines = normalizeLines(text) // ensure wrapped lines again if needed
+      const headingProps = getHeadingProps(trimmed)
+      const wrappedLines = normalizeLines(text)
       const fullTextBlock = formatBlockWithBold(wrappedLines, isBullet)
 
-      slide.addText(fullTextBlock, {
-        x: 0.5,
-        y,
-        w: 8.5,
-        fontSize: headingProps.fontSize,
-        bold: headingProps.bold,
-        color: "363636",
-        lineSpacing: 1.2,
+      textBlocks.push({
+        block: fullTextBlock,
+        options: {
+          x: 0.5,
+          y,
+          w: 8.5,
+          fontSize: headingProps.fontSize,
+          bold: headingProps.bold,
+          color: "363636",
+          lineSpacing: 1.2,
+        },
       })
-
       y += wrappedLines.length * 0.6
+    })
+
+    if (textBlocks.length === 0) return // skip empty slides
+
+    const slide = pptx.addSlide()
+    slide.addImage({
+      path: "pbdlogo.png",
+      x: 8.25, y: 0.2, w: 1.5, h: 0.5
+    })
+    textBlocks.forEach(({ block, options }) => {
+      slide.addText(block, options)
     })
   })
 

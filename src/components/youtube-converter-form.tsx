@@ -17,6 +17,7 @@ const ClientOnlySelect = dynamic(() => import("./client-only-select"), { ssr: fa
 export default function YouTubeConverterForm() {
   const [youtubeUrl, setYoutubeUrl] = useState("")
   const [notes, setNotes] = useState("")
+  const [title, setTitle] = useState("")
   const [outputFormat, setOutputFormat] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
@@ -34,6 +35,7 @@ export default function YouTubeConverterForm() {
     }
 
     sessionStorage.setItem("conversionData", JSON.stringify(formData))
+    sessionStorage.setItem("Title_", title)
 
     // Navigate to processing page
     router.push("/processing")
@@ -74,6 +76,18 @@ export default function YouTubeConverterForm() {
               {youtubeUrl && !isValidYouTubeUrl(youtubeUrl) && (
                 <p className="text-sm text-red-500">Please enter a valid YouTube URL</p>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="title">Add Title</Label>
+                <Textarea
+                  id="title"
+                  placeholder="Filename for the converted document (e.g., 'My Video Notes')"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  rows={2}
+                  className="resize-none"
+                />
             </div>
 
             <div className="space-y-2">
