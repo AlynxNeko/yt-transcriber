@@ -2,6 +2,8 @@
 
 Convert any YouTube video into a downloadable **PowerPoint (`.pptx`)** or **Word Document (`.docx`)**, using the power of Gemini and modern UI.
 
+Now also supports **MP3/WAV to MP4** audio-to-video conversion with static branding!
+
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Next.js](https://img.shields.io/badge/built%20with-Next.js-blue)
 
@@ -14,6 +16,8 @@ Convert any YouTube video into a downloadable **PowerPoint (`.pptx`)** or **Word
 - ✅ Add custom title and notes
 - ✅ Gemini-based smart transcript summarization
 - ✅ Fully client-side document download
+- ✅ 🎵 Upload MP3/WAV and convert to MP4 video with static image
+- ✅ Download MP4 directly after conversion
 
 ---
 
@@ -23,7 +27,10 @@ Convert any YouTube video into a downloadable **PowerPoint (`.pptx`)** or **Word
 - `ProcessingPage`: Orchestrates async pipeline (transcript → Gemini → format)
 - `ResultsPage`: Handles document generation and download
 - `generate-docx` / `generate-pptx`: Converts Gemini output to `.docx` or `.pptx`
-- `api/` routes: Backend endpoints for transcript extraction and Gemini processing
+- `api/` routes:
+  - `/api/transcript`: Handles YouTube transcript fetch
+  - `/api/audio-converter`: Converts audio (MP3/WAV) into branded MP4 using FFmpeg
+- `AudioConverterForm`: Standalone MP3/WAV to MP4 upload and conversion UI
 
 ---
 
@@ -60,6 +67,9 @@ GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
 TRANSCRIPT_API_URL="https://your-api.com/api/transcript" # From the yt-transcript-api github that you deployed
 ```
 Currently the OPENAI isn't used yet
+FFmpeg is required for MP3 to MP4 conversion. Either:
+- Install FFmpeg globally and ensure it's in your PATH, or
+- Use ffmpeg-static (already bundled)
 
 ### 4. Start the dev server
 ```bash
@@ -74,7 +84,8 @@ Then go to http://localhost:3000
 - Shadcn/UI for components
 - Lucide Icons
 - PptxGenJS and docx for document generation
-- Gemini via [Google AI Studio](https://aistudio.google.com/) (could be changed to GPT via OpenAI for better generationn)
+- Gemini via [Google AI Studio](https://aistudio.google.com/) (could be changed to GPT via OpenAI for better generation)
+- `fluent-ffmpeg` with `ffmpeg-static` for server-side audio-to-video processing
 
 ---
 
@@ -94,12 +105,22 @@ Add screenshots by placing image links or embedding local images. For example:
 
 ---
 
-### Home Page
+### Youtube Conversion Home Page
 ![Home Page](./screenshots/home.png)
 
 ---
 
-### Conversion Result
+### Youtube Conversion Result
+![Result Page](./screenshots/result.png)
+
+---
+
+### Audio Conversion Home Page
+![Result Page](./screenshots/result.png)
+
+---
+
+### Audio Conversion Result
 ![Result Page](./screenshots/result.png)
 
 ---
@@ -108,4 +129,6 @@ Add screenshots by placing image links or embedding local images. For example:
 - Add support for PDF export
 - Upload custom transcripts (non-YouTube)
 - Login system to track conversion history
+- 🔊 Allow selecting background image or audio fade effects for MP3→MP4
+- 🎨 Customize branding or visuals for the generated video
 
