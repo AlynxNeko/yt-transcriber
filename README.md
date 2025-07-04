@@ -32,9 +32,6 @@ Convert any YouTube video into a downloadable **PowerPoint (`.pptx`)** or **Word
 This project **requires a deployed subproject/API service** to function:
 
 > 🔗 Must deploy [`yt-transcriber-api`](https://github.com/AlynxNeko/yt-transcript-api) 
-> The following endpoints must be available:
-> - `POST /api/transcript` → returns transcript
-> - `POST /api/generate` → returns Gemini-formatted content
 
 Update your `fetch` URLs if deploying elsewhere.
 
