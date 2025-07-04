@@ -106,22 +106,22 @@ Add screenshots by placing image links or embedding local images. For example:
 ---
 
 ### Youtube Conversion Home Page
-![Home Page](./screenshots/home.png)
+![Home Page](./screenshots/yt_home.png)
 
 ---
 
 ### Youtube Conversion Result
-![Result Page](./screenshots/result.png)
+![Result Page](./screenshots/yt_result.png)
 
 ---
 
 ### Audio Conversion Home Page
-![Result Page](./screenshots/result.png)
+![Result Page](./screenshots/audio_home.png)
 
 ---
 
 ### Audio Conversion Result
-![Result Page](./screenshots/result.png)
+![Result Page](./screenshots/audio_result.png)
 
 ---
 
