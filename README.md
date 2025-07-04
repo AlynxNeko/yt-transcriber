@@ -45,8 +45,8 @@ Update your `fetch` URLs if deploying elsewhere.
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-org/youtube-to-docx-converter.git
-cd youtube-to-docx-converter
+git clone https://github.com/AlynxNeko/yt-transcriber.git
+cd yt-transcriber
 ```
 
 ### 2. Install dependencies
@@ -60,7 +60,7 @@ Rename .example.env.local and change it's content
 ```env
 OPENAI_API_KEY="NOT_REALLY_USED_NOW"
 GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
-TRANSCRIPT_API_URL="https://your-api.com/api/transcript" # From the yt-transcriber-api github that you deployed
+TRANSCRIPT_API_URL="https://your-api.com/api/transcript" # From the yt-transcript-api github that you deployed
 ```
 Currently the OPENAI isn't used yet
 
