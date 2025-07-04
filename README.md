@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# YouTube to Document Converter
 
-## Getting Started
+Convert any YouTube video into a downloadable **PowerPoint (`.pptx`)** or **Word Document (`.docx`)**, using the power of Gemini and modern UI.
 
-First, run the development server:
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Next.js](https://img.shields.io/badge/built%20with-Next.js-blue)
+
+---
+
+## ✨ Features
+
+- ✅ Paste any valid YouTube URL
+- ✅ Choose between PPTX or DOCX output
+- ✅ Add custom title and notes
+- ✅ Gemini-based smart transcript summarization
+- ✅ Fully client-side document download
+
+---
+
+## 📦 Project Structure
+
+- `YouTubeConverterForm`: Accepts URL, title, notes, and output format
+- `ProcessingPage`: Orchestrates async pipeline (transcript → Gemini → format)
+- `ResultsPage`: Handles document generation and download
+- `generate-docx` / `generate-pptx`: Converts Gemini output to `.docx` or `.pptx`
+- `api/` routes: Backend endpoints for transcript extraction and Gemini processing
+
+---
+
+## ⚠️ Sub-Project Dependency
+
+This project **requires a deployed subproject/API service** to function:
+
+> 🔗 Must deploy [`yt-transcriber-api`](https://github.com/AlynxNeko/yt-transcript-api) 
+> The following endpoints must be available:
+> - `POST /api/transcript` → returns transcript
+> - `POST /api/generate` → returns Gemini-formatted content
+
+Update your `fetch` URLs if deploying elsewhere.
+
+---
+
+## 🚀 Setup Instructions
+
+### 1. Clone the repo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-org/youtube-to-docx-converter.git
+cd youtube-to-docx-converter
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
+```bash
+npm install
+# or
+pnpm install
+```
+### 3. Environtment Setup
+Rename .example.env.local and change it's content
+```env
+OPENAI_API_KEY="NOT_REALLY_USED_NOW"
+GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+TRANSCRIPT_API_URL="https://your-api.com/api/transcript" # From the yt-transcriber-api github that you deployed
+```
+Currently the OPENAI isn't used yet
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Start the dev server
+```bash
+npm run dev
+```
+Then go to http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠 Tech Stack
+- Next.js (App Router)
+- Shadcn/UI for components
+- Lucide Icons
+- PptxGenJS and docx for document generation
+- Gemini via [Google AI Studio](https://aistudio.google.com/) (could be changed to GPT via OpenAI for better generationn)
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📄 License
+This project is licensed under the MIT License — see the [LICENSE](./LICENSE) file for details.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🙋‍♂️ Author
+AlynxNeko
+[GitHub](https://github.com/AlynxNeko)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📎 Screenshots
+Add screenshots by placing image links or embedding local images. For example:
+
+---
+
+### Home Page
+![Home Page](./screenshots/home.png)
+
+---
+
+### Conversion Result
+![Result Page](./screenshots/result.png)
+
+---
+
+## 💡 Future Ideas
+- Add support for PDF export
+- Upload custom transcripts (non-YouTube)
+- Login system to track conversion history
+

@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
     if (!videoId) {
       return NextResponse.json({ error: "Invalid YouTube URL" }, { status: 400 })
     }
-
-    const apiUrl = `http://localhost:5000/transcript/${videoId}`
+    const transcriptApiBaseUrl = process.env.TRANSCRIPT_API_URL || "http://localhost:5000"
+    const apiUrl = `${transcriptApiBaseUrl}/transcript/${videoId}`
     const res = await fetch(apiUrl)
 
     if (!res.ok) {
